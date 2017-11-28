@@ -6,7 +6,7 @@
   <script type="text/javascript">
 
 var vertices, segments, angles;
-
+var clX = -1, clY = -1;
 animating = false;
 
 function setup() {
@@ -29,10 +29,24 @@ function setup() {
     angles = [0, 0, Math.PI/4, Math.PI/2, 3*Math.PI/4];
 
     if (!animating){
-      while (segments.length<2000) {
+      while (segments.length<3000) {
         add_segment();
       }
     }
+}
+
+function get_flowers() {
+  result = {}
+  for (var i in segments) {
+      s = segments[i];
+      k1 = s[0] + "," + s[1]
+      k2 = s[2] + "," + s[3]
+      if (! (k1 in result) ) result[k1] = [];
+      if (! (k2 in result) ) result[k2] = [];
+      result[k1].push([s[2] - s[0], s[3] - s[1]]);
+      result[k2].push([s[0] - s[2], s[1] - s[3]]);
+  }
+  return result
 }
 
 
@@ -74,9 +88,41 @@ function containsSegment(x1, y1, x2, y2, sx, sy) {
 }
 
 function draw() {
+  background(0);
+  stroke("gray")
+  strokeWeight(1);
+
   if (animating) {
-    add_segment();
+    s = add_segment();
+    if (s != false) {
+      line(s[0], s[1], s[2], s[3]);
+    }
   }
+
+  else {
+    for (i in segments) {
+      s = segments[i];
+
+      line(s[0], s[1], s[2], s[3]);
+    }
+  }
+
+  if (clX >=0 && clY >= 0){
+    stroke("red")
+    strokeWeight(4);
+    line(mouseX, mouseY, clX, clY);
+    for (i in segments) {
+      s = segments[i];
+      // TODO: implicate recursively so can get bigger segments of the shapes
+      if(s[0] == clX && s[1] == clY){
+        line(100, 700, 100 + (s[2] - s[0])*3, 700 + (s[3] - s[1])*3);
+      }
+      if(s[2] == clX && s[3] == clY){
+        line(100, 700, 100 + (s[0] - s[2])*3, 700 + (s[1] - s[3])*3);
+      }
+    }
+  }
+
 }
 
 function add_segment() {
@@ -91,8 +137,8 @@ function add_segment() {
     let dist = Math.pow(Math.pow(Math.random() * 2.5, 2), 2) + 5;
 
     // TODO use point object?
-    let x = start_vertex[0] + dist * Math.cos(angle);
-    let y = start_vertex[1] + dist * Math.sin(angle);
+    let x = Math.floor(start_vertex[0] + dist * Math.cos(angle));
+    let y = Math.floor(start_vertex[1] + dist * Math.sin(angle));
     let clearance_x = start_vertex[0] + (20+dist) * Math.cos(angle);
     let clearance_y = start_vertex[1] + (20+dist) * Math.sin(angle);
 
@@ -111,17 +157,33 @@ function add_segment() {
 
     }
     if(ok) {
-      line(start_vertex[0], start_vertex[1], x, y);
 
       vertices.push([x,y])
       segments.push([start_vertex[0], start_vertex[1], x, y])
       if (Math.random()<0.9) {
         vertices.splice(0,1);
       }
+      return [start_vertex[0], start_vertex[1], x, y];
     }
+    return false;
 }
 
-function mouseClicked() {
+function mouseMoved() {
+
+  closest = -1;
+  clX = 0;
+  clY = 0;
+  for (var i in segments) {
+      v = segments[i];
+      cur_dist = Math.sqrt(Math.pow(v[0] - mouseX, 2) + Math.pow(v[1] - mouseY, 2));
+      if (closest == -1 || cur_dist < closest){
+          clX = v[0];
+          clY = v[1];
+          closest = cur_dist;
+      }
+  }
+  stroke("red")
+  line(mouseX, mouseY, clX, clY);
 
 }
 
