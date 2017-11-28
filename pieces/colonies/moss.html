@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+   <head>
+   <script src="../../js/p5.js"></script>
+  <script src="../../js/p5.dom.js"></script>
+  <script type="text/javascript">
+
+var nRows, nCols;
+
+function setup() {
+
+    width = window.innerWidth-10
+    height = window.innerHeight-10
+
+    createCanvas(width, height);
+    frameRate(25);
+    stroke("gray")
+
+    // make a 10 x 10 grid and fill each square with some variant
+    nRows = Math.floor(width / 200);
+    nCols = Math.floor(height / 200);
+
+  background(0);
+    curX = 0;
+    
+    curcol = 0;
+    while (curX < width){
+      curY = 0;
+      currow = 0;
+      while (curY < height){
+        fill_rect_A(curX,curY,curX+150,curY+150, currow %2 ==0);
+        currow ++;
+        curY += 200;
+      }
+      curcol ++;
+      curX += 200;
+    }
+
+  
+}
+
+function fill_rect_A(xFrom, yFrom, xTo, yTo, regular){
+
+  strokeSize = Math.floor(Math.random()*30 + 10);
+  ySpace = Math.floor(Math.random()*12 - 6);
+  xSpace = Math.floor(Math.random()*10 + 6);
+  xOffset = Math.floor(Math.random()*xSpace);
+  regularity = Math.floor(Math.random()*6);
+
+  remains = yFrom;
+  gray_toggle = false;
+  rowct = 0;
+  while (remains <yTo) {
+    rowct++;
+    if (regular) {
+      fromx = regularity*rowct%xSpace + xFrom;
+    } else{
+        fromx = Math.floor(Math.random()*10) + xFrom;
+      }
+    while (fromx < xTo){
+      fromx += 1 + xSpace;
+      line(fromx, remains, fromx, remains + strokeSize)
+    }
+    remains += strokeSize + ySpace;
+  }
+}
+
+function draw() {
+}
+
+
+
+function mouseClicked() {
+
+}
+
+      </script>
+   </head>
+   <body style="padding:0px;margin:auto;background-color:#000">
+   </body>
+</html>
