@@ -7,7 +7,7 @@
 
 var vertices, segments, angles;
 var clX = -1, clY = -1;
-animating = false;
+animating = true;
 
 function setup() {
 
@@ -94,18 +94,16 @@ function draw() {
 
   if (animating) {
     s = add_segment();
-    if (s != false) {
+    /*if (s != false) {
       line(s[0], s[1], s[2], s[3]);
-    }
+    }*/
   }
 
-  else {
-    for (i in segments) {
+ for (i in segments) {
       s = segments[i];
 
       line(s[0], s[1], s[2], s[3]);
     }
-  }
 
   if (clX >=0 && clY >= 0){
     stroke("red")
