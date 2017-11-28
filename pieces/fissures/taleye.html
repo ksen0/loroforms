@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+   <head>
+   <script src="js/p5.js"></script>
+      <script src="js/p5.dom.js"></script>
+
+      <script type="text/javascript">
+
+function setup() {
+  createCanvas(1000, 1000);
+
+  frameRate(15);
+
+  textSize(15);
+  noStroke();
+
+  aperture = createSlider(20, 100, 100/3);
+  aperture.position(300, 50);
+  spread = createSlider(1, 100, 75);
+  spread.position(300, 80);
+  extender = createSlider(2, 100, 100);
+  extender.position(300, 110);
+  ybuffer = createSlider(0, 100, 0);
+  ybuffer.position(300, 140);
+
+  stroke(255);
+  noFill();
+
+  randoms = [];
+  for(var i = 0; i<100; i++){
+    randoms.push(random());
+  }
+}
+
+function draw() {
+  background(0);
+  text("a:="+aperture.value(), aperture.x + aperture.width, aperture.y + 5);
+  text("s:="+spread.value(), spread.x + spread.width, spread.y + 5);
+  text("e:="+extender.value(), extender.x + extender.width, extender.y + 5);
+
+
+  // individual showcase:
+  horizontal(150, 60, 80);
+  horizontal(150, 45, 50);
+  horizontal(150, 130, 50);
+  vertical(600, 100, 80, 33);
+
+  var x_offset = 600;
+  var y_offset = 300;
+  var start_rad = 100;
+  var cur_rad = start_rad;
+  var depth = 5;
+
+  // regular alternating form
+  for (var i = 0; i < 3*depth; i++) {
+    var which = i % 2;
+    
+    if (i > 0 && i % depth == 0){
+        y_offset += 150 + ybuffer.value();
+        cur_rad = start_rad;
+    }
+
+    if (which == 1){
+      horizontal(x_offset, y_offset, cur_rad);
+    } else {
+      vertical(x_offset, y_offset, cur_rad);
+    }
+
+    cur_rad  /= 2;
+  }
+
+  // semi-rugged alternating form
+  x_offset = 370;
+  y_offset = 300;
+  cur_rad = start_rad;
+
+  tendency = 0;
+  for (var i = 0; i < 3*depth; i++) {
+    var which = randoms[i];
+    if (i==0) {
+      tendency = which;
+    }
+    
+    if (i > 0 && i % depth == 0){
+        y_offset += 100 + ybuffer.value();
+        if (which >= 0.5) {
+            y_offset += 50;
+        }
+        if (tendency >= 0.5) {
+          y_offset +=50;
+        }
+        tendency = which;
+        cur_rad = start_rad;
+    }
+
+    if (which < 0.5){
+      horizontal(x_offset, y_offset, cur_rad);
+    } else {
+      vertical(x_offset, y_offset, cur_rad);
+    }
+
+    cur_rad  /= 2;
+  }
+
+  // rugged alternating form
+  x_offset = 140;
+  y_offset = 300;
+  cur_rad = start_rad;
+
+  tendency = 0;
+  for (var i = 0; i < 3*depth; i++) {
+    var which = randoms[i];
+    if (i==0) {
+      tendency = which;
+    }
+    
+    if (i > 0 && i % depth == 0){
+        y_offset += 100 + ybuffer.value();
+        if (which >= 0.5) {
+            y_offset += 50;
+        }
+        if (tendency >= 0.5) {
+          y_offset +=50;
+        }
+        tendency = which;
+        cur_rad = start_rad;
+    }
+
+    if (which < 0.5){
+      horizontal(x_offset, y_offset, cur_rad,
+        randoms[i]*2-4, randoms[i]*5-10, randoms[i]*5-10);
+    } else {
+      vertical(x_offset, y_offset, cur_rad,
+        randoms[i]*2-4, randoms[i]*5-10, randoms[i]*5-10);
+    }
+
+    cur_rad  /= 2;
+  }
+
+}
+
+function jitter(original, jitter){
+  var result = original + jitter;
+  if(jitter != 0)
+  if (result <= 1){
+    result = 2;
+  }
+  if (result >= 100){
+    result = 99;
+  }
+
+  return result;
+}
+
+// x and y center
+function vertical(x, y, r,
+  aperture_value = 0, spread_value = 0, extender_value = 0) {
+
+  aperture_value = jitter(aperture.value(), aperture_value);
+  spread_value = jitter(spread.value(), spread_value);
+  extender_value = jitter(extender.value(), extender_value);
+
+
+  ellipse(x, y, r, r);
+  
+  var w = r*(100/aperture_value);
+
+  // east
+  arc(x - w/2 + r/2, y,
+    w,
+    2*r*(100/spread_value),
+    - QUARTER_PI - QUARTER_PI/extender_value,
+    QUARTER_PI + QUARTER_PI/extender_value);
+
+
+  //west
+  arc(x + w/2 - r/2, y,
+    w,
+    2*r*(100/spread_value),
+    PI - QUARTER_PI - QUARTER_PI/extender_value,
+    PI + QUARTER_PI + QUARTER_PI/extender_value);
+
+}
+
+function horizontal(x, y, r,
+  aperture_value = 0, spread_value = 0, extender_value = 0){
+
+
+  aperture_value = jitter(aperture.value(), aperture_value);
+  spread_value = jitter(spread.value(), spread_value);
+  extender_value = jitter(extender.value(), extender_value);
+
+  ellipse(x, y, r, r);
+  
+  // north
+  arc(x, y + r,
+    2*r*(100/spread_value),
+    r*(100/aperture_value),
+    -PI + QUARTER_PI - QUARTER_PI/extender_value,
+    - QUARTER_PI + QUARTER_PI/extender_value);
+
+  // south
+  arc(x, y - r,
+    2*r*(100/spread_value),
+    r*(100/aperture_value),
+    + QUARTER_PI - QUARTER_PI/extender_value,
+    - PI - QUARTER_PI + QUARTER_PI/extender_value);
+}
+
+
+function mouseClicked() {
+
+  randoms = [];
+  for(var i = 0; i<100; i++){
+    randoms.push(random());
+  }
+
+}
+
+      </script>
+   </head>
+   <body>
+   </body>
+</html>
