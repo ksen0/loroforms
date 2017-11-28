@@ -24,9 +24,11 @@ function setup() {
     segments = new Array();
     // TODO use objects!!
 
-
     angles = [0, 0, Math.PI/4, Math.PI/2, 3*Math.PI/4];
 }
+
+
+// uses: https://stackoverflow.com/questions/9043805/test-if-two-lines-intersect-javascript-function
 function has_intersection(x1, y1, x2, y2, x3, y3, x4, y4) {
   var f1 = RotationDirection(x1, y1, x2, y2, x4, y4);
   var f2 = RotationDirection(x1, y1, x2, y2, x3, y3);
@@ -44,6 +46,7 @@ function has_intersection(x1, y1, x2, y2, x3, y3, x4, y4) {
   
   return intersect;
 }
+
 function RotationDirection(p1x, p1y, p2x, p2y, p3x, p3y) {
   if (((p3y - p1y) * (p2x - p1x)) > ((p2y - p1y) * (p3x - p1x)))
     return 1;
@@ -63,18 +66,14 @@ function containsSegment(x1, y1, x2, y2, sx, sy) {
 }
 
 function draw() {
-    //background(0);
-
     v_in = Math.floor(Math.random() * vertices.length);
-      //console.log(v_in);
     let start_vertex = vertices[v_in];
     let angle = angles[Math.floor(Math.random() * angles.length)] + (Math.random()*Math.PI/8 - Math.PI/4)/2;
+    // TODO add jitter here
+    // TODO add wingspan here
+
     //let angle = Math.random() * Math.PI;
     let dist = Math.pow(Math.pow(Math.random() * 2.5, 2), 2) + 5;
-
-    //console.log(start_vertex)
-    //console.log(angle)
-    //console.log(dist)
 
     // TODO use point object?
     let x = start_vertex[0] + dist * Math.cos(angle);
@@ -83,7 +82,6 @@ function draw() {
     let clearance_y = start_vertex[1] + (20+dist) * Math.sin(angle);
 
     ok = true;
-    stroke("green");
     for (var i in segments){
       s = segments[i];
       if(s[0] == start_vertex[0] && s[1] == start_vertex[1]){
@@ -94,9 +92,8 @@ function draw() {
       }
       if (has_intersection(s[0], s[1], s[2], s[3], start_vertex[0], start_vertex[1], clearance_x, clearance_y)){
           ok = false;
-          //stroke("blue");
       }
-     // console.log(s + " vs " + [start_vertex[0], start_vertex[1], x, y]);
+
     }
     if(ok) {
       line(start_vertex[0], start_vertex[1], x, y);
@@ -106,55 +103,12 @@ function draw() {
       if (Math.random()<0.9) {
         vertices.splice(0,1);
       }
-  }
-  else{
-    //console.log("stuck with " + vertices.length + " vertices and " + segments.length +  " segments")
-  }
-
-    // add new segment to vertices
-    // control angles - which angles ok, add jitter, etc
-
-    // how to summarize the shape?
-    // 1. convex hull
-    // 2. min-avg-max of "branching" at vertices (# segments a vertex is implicated in)
-    // 3A. min-avg-max of length of line segments without brnaching (but w different segments)
-    // 3B. min-avg-max angles among those lines
-
-    // cluster the shapes and show the clusters
-    // clusterfuck.js
-
-
-    // different things grow at segments and different kinds of vertices - eg, concentration is the silencing of multi-branch vertices
-
-    // fractalization
-
-    // polar vs cartesian
-
-    //https://github.com/sleepokay/lichen - lichens grow without crossing the impermeable boundaries
-    // redardation and suppression of growth is willful and signifies sentience
-
+    }
 }
 
 
 
 function mouseClicked() {
-
-// determine nearest point and show config for that
-// clustering
-// pausing
-// clearance (packing parameter)
-// jitter
-// animating and static versions
-// show clusters (and within clusters) - or dump data somehow for a different app???
-// be able to constrain to a certain number or sequence of glyphs
-// be able to fractalize
-// connect to other things - the eye (the leaved fissures), and the lichens and the loro
-
-//https://n-e-r-v-o-u-s.com/blog/?p=6721
-//https://cmivfx.com/houdini-l-system-essentials-2
-// https://www.wired.com/2015/12/airbuss-newest-design-is-based-on-slime-mold-and-bones/
-// https://www.wired.com/2010/01/slime-mold-grows-network-just-like-tokyo-rail-system/ slime mold
-// fairy rings http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0149254
 
 }
 
