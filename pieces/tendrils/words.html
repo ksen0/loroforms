@@ -20,7 +20,7 @@ function ShootFactory(){
 function ShootPrototype(permitted_angles){
   this.permitted_angles = permitted_angles;
   this.gen = function(){
-    let offset = (Math.random()*Math.PI*2);
+    let offset = 0;//(Math.random()*Math.PI*2);
     let output = [];
     for (var i in this.permitted_angles) {
       output.push(jitter(this.permitted_angles[i]) + offset);
@@ -31,7 +31,7 @@ function ShootPrototype(permitted_angles){
 
 function jitter(angle){
   // TODO add the jitter
-  return angle + (Math.random()*Math.PI/8 - Math.PI/4)/2;
+  return angle;// + (Math.random()*Math.PI/8 - Math.PI/4)/2;
 }
 
 
@@ -59,15 +59,15 @@ function setup() {
 
     shoot = new ShootFactory();
     //shoot.grows(new ShootPrototype([0, Math.PI/4, Math.PI/2, 3*Math.PI/4]))
-    shoot.grows(new ShootPrototype([-Math.PI/3, Math.PI/3]))
+    shoot.grows(new ShootPrototype([Math.PI/3, 2*Math.PI/3]))
     shoot.grows(new ShootPrototype([0, Math.PI]))
 
     if (!animating){
       while (segments.length<500) {
         let angles = shoot.gen();
         for (var i in angles) {
-           s = add_segment(angles[i]);
-
+           //s = add_segment(angles[i]);
+            console.log("WAIT NO")
         }
       }
     }
@@ -131,11 +131,13 @@ function draw() {
   strokeWeight(1);
 
   if (animating) {
-    let angles = shoot.gen();
-    for (var i in angles) {
-        s = add_segment(angles[i]);
 
-    }
+    let v_in = Math.floor(Math.random() * vertices.length);
+    let start_vertex = vertices[v_in];
+    let angles = shoot.gen();
+    vertices.splice(v_in, 1);
+    let s = new Shoot(start_vertex[0], start_vertex[1], angles);
+    s.gen(0);
   }
 
  for (i in segments) {
@@ -162,44 +164,64 @@ function draw() {
 
 }
 
-// provisional addition of segments - return new vertices if can do it, then
-// if length ok, can go ahead
-function add_segment(angle) {
+function Shoot(origin_x, origin_y, angles) {
 
-    v_in = Math.floor(Math.random() * vertices.length);
-    let start_vertex = vertices[v_in];
-    let dist = Math.pow(Math.pow(Math.random() * 2.5, 2), 2) + 5;
+    this.origin_y = origin_y;
+    this.origin_x = origin_x;
+    this.angles = angles;
 
-    // TODO use point object?
-    let x = Math.floor(start_vertex[0] + dist * Math.cos(angle));
-    let y = Math.floor(start_vertex[1] + dist * Math.sin(angle));
-    let clearance_x = start_vertex[0] + (dist) * Math.cos(angle);
-    let clearance_y = start_vertex[1] + (dist) * Math.sin(angle);
+    this.gen = function(clearance) {
 
-    ok = true;
-    for (var i in segments){
-      s = segments[i];
-      if(s[0] == start_vertex[0] && s[1] == start_vertex[1]){
-        continue;
+      let provisional_vertices = [];
+
+      console.log(this.angles);
+      for (var a in this.angles) {
+        let angle = this.angles[a];
+        // TODO add sensible parameterization to distance
+        let dist = Math.pow(Math.pow(Math.random() * 2.5, 2), 2) + 5;
+        let x = Math.floor(this.origin_x + dist * Math.cos(angle));
+        let y = Math.floor(this.origin_y + dist * Math.sin(angle));
+        let clearance_x = this.origin_x + (dist + clearance) * Math.cos(angle);
+        let clearance_y = this.origin_y + (dist + clearance) * Math.sin(angle);
+        ok = true;
+        for (var i in segments){
+          s = segments[i];
+          if(s[0] == this.origin_x && s[1] == this.origin_y){
+            continue;
+          }
+          if(s[2] == this.origin_x && s[3] == this.origin_y){
+            continue;
+          }
+          if (has_intersection(s[0], s[1], s[2], s[3],
+            this.origin_x, this.origin_y, clearance_x, clearance_y)){
+              ok = false;
+          }
+        }
+        if (ok) {
+          provisional_vertices.push([x,y]);
+        }
       }
-      if(s[2] == start_vertex[0] && s[3] == start_vertex[1]){
-        continue;
-      }
-      if (has_intersection(s[0], s[1], s[2], s[3], start_vertex[0], start_vertex[1], clearance_x, clearance_y)){
-          ok = false;
+
+      if(provisional_vertices.length == this.angles.length) {
+        console.log(provisional_vertices);
+        for (var i in provisional_vertices){
+          x = provisional_vertices[i][0];
+          y = provisional_vertices[i][1];
+          vertices.push([x,y])
+          segments.push([this.origin_x, this.origin_y, x, y])
+          // TODO remove the implicated vertex
+
+
+          // TODO decide how to maintain this kind of behaviour
+          //if (Math.random()<0.9) {
+              //vertices.splice(0,1);
+          //}
+        }
+        return true;
       }
 
+      return false;
     }
-    if(ok) {
-
-      vertices.push([x,y])
-      segments.push([start_vertex[0], start_vertex[1], x, y])
-      if (Math.random()<0.9) {
-        vertices.splice(0,1);
-      }
-      return [start_vertex[0], start_vertex[1], x, y];
-    }
-    return false;
 }
 
 function mouseMoved() {
