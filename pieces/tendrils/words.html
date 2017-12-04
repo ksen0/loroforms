@@ -1,17 +1,57 @@
 <!DOCTYPE html>
-<html>
-   <head>
-   <script src="../../js/p5.js"></script>
-  <script src="../../js/p5.dom.js"></script>
-  <script type="text/javascript">
 
-function ShootFactory(){
+<html>
+  <head>
+    <script src="../../js/p5.js"></script>
+    <script src="../../js/p5.dom.js"></script>
+    <script type="text/javascript">
+
+// TODO add fading over time, with smaller "clusters" fading faster than big ones
+// bc of the symbiosis
+
+// TODO break out into a JSON dictionary
+LACK = [0, Math.PI/2];
+SUSTENANCE = [Math.PI/3, 2*Math.PI/3, 3*Math.PI/2];
+NEGATION = [0, Math.PI, 3*Math.PI/2];
+MANYNESS = [0, 2*Math.PI/3, 4*Math.PI/3, Math.PI/8, 2*Math.PI/3 + Math.PI/8, 4*Math.PI/3 + Math.PI/8];
+DISCOVERY = [0, Math.PI/8];
+
+function ShootFactory() {
   this.prototypes = [];
-  // TODO enable non-uniform probability distribution
-  this.grows = function(prototype){
+  // TODO enable non-uniform probability distribution, both for growth and inhibition
+  this.grow = function(prototype) {
+    prototype.sort();
+    prototype = new ShootPrototype(prototype);
     this.prototypes.push(prototype);
   }
+  this.quiet = function(list = null) {
+    if (list == null) {
+      console.log("Extinguished " + this.prototypes.length + " proto-forms.");
+      this.prototypes = [];
+      return;
+    }
+    list.sort();
+    let match = null;
+    for (var i in this.prototypes) {
+      if (list.length != this.prototypes[i].length) {
+        continue;
+      }
+      for (var j in this.list) {
+        if (this.list[j] != this.prototypes[i][j]) {
+          continue;
+        }
+      }
+      // If we get to this point, we've found a match!
+      match = i;
+      break;
+    }
+    if (match != null)
+      this.prototypes.splice(match, 1);
+  }
   this.gen = function(origin_vertex){
+    if (this.prototypes.length == 0){
+      return [];
+    }
     return this.prototypes[Math.floor(Math.random() * this.prototypes.length)].gen(origin_vertex);
   }
 }
@@ -29,7 +69,6 @@ function ShootPrototype(permitted_angles){
       if (s[2] == origin_vertex[0] && s[3] == origin_vertex[1]){
         var angle_diff = Math.atan2(s[1] - s[3], s[0] - s[2]);
         offset = Math.PI*2 - (this.permitted_angles[which] - angle_diff);
-        console.log("set offset: " + offset);
         // TODO note the angle to this point, and calculate an offset s.t.
         // this is contained
       }
@@ -44,8 +83,7 @@ function ShootPrototype(permitted_angles){
 }
 
 function jitter(angle){
-  // TODO add the jitter
-  return angle + (Math.random()*Math.PI/32 - Math.PI/16);
+  return angle;/// + (Math.random()*Math.PI/32 - Math.PI/16);
 }
 
 
@@ -72,24 +110,6 @@ function setup() {
     // TODO use objects!!
 
     shoot = new ShootFactory();
-    //shoot.grows(new ShootPrototype([0, Math.PI/4, Math.PI/2, 3*Math.PI/4]))
-
-    // hunger
-    shoot.grows(new ShootPrototype([Math.PI/3, 2*Math.PI/3, 3*Math.PI/2]))
-    shoot.grows(new ShootPrototype([0, Math.PI/2]))
-
-    //ADDITION
-    //negation
-    //shoot.grows(new ShootPrototype([0, Math.PI, 3*Math.PI/2]))
-    //manyness
-    //shoot.grows(new ShootPrototype([0, 2*Math.PI/3, 4*Math.PI/3, Math.PI/8, 2*Math.PI/3 + Math.PI/8, 4*Math.PI/3 + Math.PI/8]))
-    //discovery (for measurement) - vs change (for addition/subtraction)
-    //shoot.grows(new ShootPrototype([0, Math.PI/8]))
-
-    //shoot.grows(new ShootPrototype([0, Math.PI/2]))
-
-    // TODO create a clickable generator
-    shoot.grows(new ShootPrototype([0, Math.PI/2]))
 
     if (!animating){
       while (segments.length<500) {
@@ -162,18 +182,18 @@ function draw() {
 
   if (animating) {
 
-
-   let start_vertex = [Math.floor(Math.random() * window.innerWidth),
+    let v_in = null;
+    let start_vertex = [Math.floor(Math.random() * window.innerWidth),
                           Math.floor(Math.random() * window.innerHeight)]
-    if (vertices.length > 0){
-     let v_in = Math.floor(Math.random() * vertices.length);
+    if (vertices.length > 0 && Math.random()<0.9){
+     v_in = Math.floor(Math.random() * vertices.length);
      start_vertex = vertices[v_in];
-     vertices.splice(v_in, 1);
-    } 
-    // TODO force one of the angles to be aligned with the existing tendril
+    }
     let angles = shoot.gen(start_vertex);
     let s = new Shoot(start_vertex[0], start_vertex[1], angles);
-    s.gen(5);
+    if (s.gen(5) && v_in != null) {
+      vertices.splice(v_in, 1);
+    }
   }
 
  for (i in segments) {
@@ -208,12 +228,17 @@ function Shoot(origin_x, origin_y, angles) {
 
     this.gen = function(clearance) {
 
+      if (angles.length == 0) {
+        return false;
+      }
+
       let provisional_vertices = [];
 
       for (var a in this.angles) {
         let angle = this.angles[a];
         // TODO add sensible parameterization to distance
-        let dist = Math.pow(Math.pow(Math.random() * 2.5, 2), 2) + 10;
+        //let dist = Math.pow(Math.pow(Math.random() * 2.5, 2), 2) + 10;
+        let dist = Math.pow(Math.pow(Math.random() * 4, 2), 2) + 10;
         let x = Math.floor(this.origin_x + dist * Math.cos(angle));
         let y = Math.floor(this.origin_y + dist * Math.sin(angle));
         let clearance_x = this.origin_x + (dist + clearance) * Math.cos(angle);
