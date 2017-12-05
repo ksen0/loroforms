@@ -4,25 +4,23 @@
   <head>
     <script src="../../js/p5.js"></script>
     <script src="../../js/p5.dom.js"></script>
+    <script src="dict.js"></script>
     <script type="text/javascript">
 
 // TODO add fading over time, with smaller "clusters" fading faster than big ones
 // bc of the symbiosis
 
-// TODO break out into a JSON dictionary
-LACK = [0, Math.PI/2];
-SUSTENANCE = [Math.PI/3, 2*Math.PI/3, 3*Math.PI/2];
-NEGATION = [0, Math.PI, 3*Math.PI/2];
-MANYNESS = [0, 2*Math.PI/3, 4*Math.PI/3, Math.PI/8, 2*Math.PI/3 + Math.PI/8, 4*Math.PI/3 + Math.PI/8];
-DISCOVERY = [0, Math.PI/8];
-
 function ShootFactory() {
   this.prototypes = [];
   // TODO enable non-uniform probability distribution, both for growth and inhibition
-  this.grow = function(prototype) {
-    prototype.sort();
-    prototype = new ShootPrototype(prototype);
-    this.prototypes.push(prototype);
+  this.grow = function(prototype_list) {
+    console.log(prototype_list);
+    for (var i in prototype_list){
+      prototype = prototype_list[i];
+      prototype.sort();
+      prototype = new ShootPrototype(prototype);
+      this.prototypes.push(prototype);
+    }
   }
   this.quiet = function(list = null) {
     if (list == null) {
