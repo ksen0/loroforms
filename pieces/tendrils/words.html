@@ -11,6 +11,7 @@
 // bc of the symbiosis
 
 var JITTER = Math.PI/16;
+var CLEARANCE = 5;
 
 function ShootFactory() {
   this.prototypes = [];
@@ -75,7 +76,6 @@ function ShootPrototype(permitted_angles){
     }
     let output = [];
     for (var i in this.permitted_angles) {
-      // TODO this is a bug, needs fixing!
       if (i==which && anchored) continue;
       output.push(jitter(this.permitted_angles[i]) + offset);
     }
@@ -90,6 +90,12 @@ function jitter(angle){
 var vertices, segments, angles;
 var clX = -1, clY = -1;
 animating = true;
+
+function quiet(){
+  shoot.quiet()
+  segments = [];
+  vertices = [];
+}
 
 function setup() {
 
@@ -184,13 +190,13 @@ function draw() {
     let v_in = null;
     let start_vertex = [Math.floor(Math.random() * window.innerWidth),
                           Math.floor(Math.random() * window.innerHeight)]
-    if (vertices.length > 0 && Math.random()<0.9){
+    if (vertices.length > 0 && Math.random() < 0.9){
      v_in = Math.floor(Math.random() * vertices.length);
      start_vertex = vertices[v_in];
     }
     let angles = shoot.gen(start_vertex);
     let s = new Shoot(start_vertex[0], start_vertex[1], angles);
-    if (s.gen(5) && v_in != null) {
+    if (s.gen(10) && v_in != null) {
       vertices.splice(v_in, 1);
     }
   }
@@ -224,7 +230,7 @@ function Shoot(origin_x, origin_y, angles) {
     this.origin_x = origin_x;
     this.angles = angles;
 
-    this.gen = function(clearance) {
+    this.gen = function() {
 
       if (angles.length == 0) {
         return false;
@@ -239,8 +245,6 @@ function Shoot(origin_x, origin_y, angles) {
         //let dist = Math.pow(Math.pow(Math.random() * 4, 2), 2) + 10;
         let x = Math.floor(this.origin_x + dist * Math.cos(angle));
         let y = Math.floor(this.origin_y + dist * Math.sin(angle));
-        let clearance_x = this.origin_x + (dist + clearance) * Math.cos(angle);
-        let clearance_y = this.origin_y + (dist + clearance) * Math.sin(angle);
         ok = true;
         for (var i in segments){
           s = segments[i];
@@ -250,9 +254,15 @@ function Shoot(origin_x, origin_y, angles) {
           if(s[2] == this.origin_x && s[3] == this.origin_y){
             continue;
           }
+
+          // Are there collisions?
           if (has_intersection(s[0], s[1], s[2], s[3],
-            this.origin_x, this.origin_y, clearance_x, clearance_y)){
+            this.origin_x, this.origin_y, x, y)){
               ok = false;
+          }
+
+          if (distance_bw(x,y,s[0],s[1],s[2],s[3]) < CLEARANCE || distance_bw(s[2],s[3],x,y) < CLEARANCE) {
+            ok = false;
           }
         }
         if (ok) {
@@ -279,6 +289,11 @@ function Shoot(origin_x, origin_y, angles) {
 
       return false;
     }
+}
+
+// via https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
+function distance_bw(x0, y0, x1, y1, x2, y2) {
+  return Math.abs(x0 * (y2 - y1) - y0 * (x2 - x1) + x2 * y1 - y2 * x1) / Math.sqrt(Math.pow(y2-y1,2) + Math.pow(x2-x1,2))
 }
 
 function mouseMoved() {
