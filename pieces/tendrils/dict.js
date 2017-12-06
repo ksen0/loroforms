@@ -17,16 +17,212 @@ var _DICT = {
 	"discovery": {
 		"angles": [0, Math.PI/8]
 	},
-	"measure": {
+	"measurement": {
 		"composite": ["discovery", "manyness"],
-		"synonyms": ["count"]
+		"synonyms": ["count", "measure"],
+		"meta": "lexember day 1"
+	},
+	"change": {
+		"angles": [0, Math.PI/2] //TODO
+	},
+	"i": {
+		"angles": [Math.PI/8, 7*Math.PI/8] //TODO
+	},
+	"we": {
+		"angles": [0, Math.PI, Math.PI/8, 7*Math.PI/8] //TODO
+	},
+	"division": {
+		"composite": ["change", "manyness", "negation", "measurement"],
+		"synonyms": ["divide", "fraction"],
+		"related": ["reproduction", "measurement"],
+		"meta": "lexember day 1"
+	},
+	"multiplication": {
+		"composite": ["change", "manyness", "measurement"],
+		"synonyms": ["multiply", "fraction"],
+		"related": ["reproduction", "measurement"],
+		"meta": "lexember day 1"
 	},
 	"subtract": {
-		"angles": [0, Math.PI/8, Math.PI, Math.PI/2]
+		"angles": [0, Math.PI/8, Math.PI, Math.PI/2],
+		"meta": "lexember day 1"
 	},
 	"add": {
-		"composite": ["subtract", "negation"]
+		"composite": ["subtract", "negation"],
+		"meta": "lexember day 1"
 	},
+	"meat": {
+		"composite": ["sustenance", "moving-one"],
+		"meta": "lexember day 1"
+	},
+	"vegetable": {
+		"composite": ["sustenance", "still-one"],
+		"synonyms": ["fruit", "starch", "cereal"],
+		"meta": "lexember day 1"
+	},
+	"sibling": {
+		"composite": ["we", "now"],
+		"synonyms": ["brother", "sister"],
+		"meta": "lexember day 1"
+	},
+	"parent": {
+		"composite": ["we", "before", "being-time"],
+		"synonyms": ["mother", "father"],
+		"meta": "lexember day 1"
+	},
+	"kid": {
+		"composite": ["we", "after", "being-time"],
+		"synonyms": ["son", "daughter", "child"],
+		"meta": "lexember day 1"
+	},
+	/*
+	"joy/bliss/transcendence": { // these should be many composites, their emotional vocabulary should be vast
+		"composite": ["we", "after", "being-time"],
+		"synonyms": ["son", "daughter", "child"],
+		"loro": true,//TODO
+		"meta": "lexember day 1"
+	},
+	"despair/sorrow/anger": {
+		"composite": ["we", "after", "being-time"],
+		"synonyms": ["son", "daughter", "child"],
+		"loro": true,//TODO
+		"meta": "lexember day 1"
+	}*/
+
+/*
+	DAY 2
+square root
+fraction
+power
+measurement
+Food and cooking
+
+to gather
+to pick (berries)
+to hunt
+to filet
+to chop
+Family and relationships
+
+loved one(s)
+partner
+lover
+friend
+friendship
+Emotions
+
+Terror
+Nervousness
+Worry
+Confidence
+Hope
+Day 5
+
+Nature & outdoors
+
+river
+bank
+stream
+lake
+sea/ocean
+Astronomy
+
+black hole
+satellite
+asteroid
+comet
+Animals
+
+horn
+hoof
+mane
+claw
+fang
+
+Day 3
+
+Mathematics
+
+protractor
+ruler
+angle
+circle
+square
+triangle
+line
+Food and cooking
+
+berry
+vegetable
+fruit
+fruit-bearing tree
+Family and relationships
+
+aunt
+uncle
+cousin (male)
+cousin (female)
+grandfather
+grandmother
+Emotions
+
+grief
+thrill
+overwhelmed
+blue
+
+Day 4
+
+Nature & outdoors
+
+tree
+forest
+flower
+plain
+field
+Astronomy
+
+star
+moon
+planet
+space
+universe
+Animals
+
+dog
+cat
+horse
+pig
+sheep
+cow
+mouse
+rat
+
+Day 6
+
+Nature & outdoors
+
+mountain
+hill
+rift
+sky
+land
+Astronomy
+
+galaxy
+telescope
+spaceship
+rocket
+Animals
+
+hide
+kibble
+cattle
+herd
+shepherd
+donkey
+
+*/
 }
 
 function dict(word){

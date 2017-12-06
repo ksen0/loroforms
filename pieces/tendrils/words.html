@@ -73,6 +73,7 @@ function ShootPrototype(permitted_angles){
     }
     let output = [];
     for (var i in this.permitted_angles) {
+      // TODO this is a bug, needs fixing!
       if (i==which) continue;
       output.push(jitter(this.permitted_angles[i]) + offset);
     }
@@ -235,8 +236,8 @@ function Shoot(origin_x, origin_y, angles) {
       for (var a in this.angles) {
         let angle = this.angles[a];
         // TODO add sensible parameterization to distance
-        //let dist = Math.pow(Math.pow(Math.random() * 2.5, 2), 2) + 10;
-        let dist = Math.pow(Math.pow(Math.random() * 4, 2), 2) + 10;
+        let dist = Math.pow(Math.pow(Math.random() * 3, 2), 2) + 10;
+        //let dist = Math.pow(Math.pow(Math.random() * 4, 2), 2) + 10;
         let x = Math.floor(this.origin_x + dist * Math.cos(angle));
         let y = Math.floor(this.origin_y + dist * Math.sin(angle));
         let clearance_x = this.origin_x + (dist + clearance) * Math.cos(angle);
