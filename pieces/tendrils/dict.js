@@ -79,7 +79,7 @@ var _DICT = {
 	"joy/bliss/transcendence": { // these should be many composites, their emotional vocabulary should be vast
 		"composite": ["we", "after", "being-time"],
 		"synonyms": ["son", "daughter", "child"],
-		"loro": true,//TODO
+		"loro": true,//TODO maybe synonyms could be more general "relationships" and be dicts w additional metadata
 		"meta": "lexember day 1"
 	},
 	"despair/sorrow/anger": {
@@ -256,4 +256,113 @@ function dict(word){
 	
 	// TODO add synonym and composite lookups
 	return output;
+}
+
+
+function test_dict() {
+
+	console.log("Testing " + Object.keys(_DICT).length + " dictionary definitions.");
+
+	let passed = true;
+
+	// synsets
+	let synpairs = 0;
+	for (var word in _DICT) {
+		if ("synonyms" in _DICT[word]) {
+			for (var syn in _DICT[word].synonyms) {
+				if ( syn in _DICT ) {
+					if ( ! ("synonyms" in _DICT[syn] && _DICT[syn].indexOf[word]) ) {
+						console.log("The synonym " + syn + " for " + word +
+							" is defined, but does not name " + word + " as a synonym.");
+						passed = false;
+					}
+					if (syn < word) {
+						synpairs --;
+					}
+				}
+				synpairs ++;
+				// Note: it is allowed for a synonym to not have its own specificaiton.
+				// This is the point of allowing synonyms, to reduce the number of
+				// necessary independent entries.
+			}
+		}
+	}
+
+	if (passed) {
+		console.log("Passed synset test with " + synpairs + " synonym pairs.");
+	}
+	
+	// composites completeness
+	passed = true;
+	let ncomps = 0;
+	for (var word in _DICT) {
+		if ("composite" in _DICT[word]) {
+			ncomps ++;
+			for (var i in _DICT[word].composite) {
+				comp = _DICT[word].composite[i];
+				if ( !(comp in _DICT) ){
+					console.log("Composite " + comp + " for word " +
+						word + " is missing definition.");
+					// TODO this test should be recursive, to test that no circular
+					// definitions or definitions without angles exist.
+					passed = false;
+				}
+			}
+		}
+	}
+
+	if (passed) {
+		console.log("Passed composite completeness test with " +
+			ncomps + " composite expressions.");
+	}
+	
+	// duplicate glyphs
+	passed = true;
+	let dupdict = {};
+	for (var word in _DICT) {
+		if ("angles" in _DICT[word]) {
+			// TODO this normalization ought to happen as a pre-processing step?
+			let normalized = [];
+		
+			for (var i in _DICT[word].angles) {
+				let a = _DICT[word].angles[i];
+				if (a < 0){ // add 2*Math.PI to every negative angle
+					normalized.push(a + Math.PI * 2); 
+				} else if (a >= Math.PI * 2) { // remainder with 2*Math.PI
+					normalized.push(a % (Math.PI * 2) );
+				} else {
+					normalized.push(a);
+				}
+			}
+			normalized.sort(); // sort angle list
+			if (normalized.length < 2) {
+				console.log("Angle precets for " + word + " contain too few angles; at least two needed.");
+				console.log(normalized);
+				passed = false;
+				continue;
+			}
+			for (var i in normalized) { // start angle list at 0
+				normalized[i] = normalized[i] - normalized[0];
+			}
+			for (var i in normalized) { // check for internal duplicates
+				if (normalized.indexOf(normalized[i]) != i) {
+					console.log("Angle precets for " + word + " contain a duplicate: " + normalized[i]);
+					passed = false;
+					continue;
+				}
+			}
+			let dupdict_key = normalized.join(); // // convert to unique string
+			if (dupdict_key in dupdict) { // if encounter a collision, report word collision
+				console.log("Angle precets for " + word + " are already used by " + dupdict[dupdict_key]);
+				passed = false;
+				continue;
+			} else { // store string in a "seen" dict, from string to initial word
+				dupdict[dupdict_key] = word;
+			}
+		}
+	}
+	if (passed) {
+		console.log("Passed orthographic uniqueness test with " +
+			Object.keys(dupdict).length + " composite expressions.");
+	}
 }
