@@ -16,14 +16,18 @@ var CLEARANCE = 5;
 function ShootFactory() {
   this.prototypes = [];
   // TODO enable non-uniform probability distribution, both for growth and inhibition
-  this.grow = function(prototype_list) {
-    console.log(prototype_list);
+  // TODO also connect it to current distribution?
+  this.grow = function(word) {
+
+    prototype_list = dict(word);
     for (var i in prototype_list){
       prototype = prototype_list[i];
       prototype.sort();
-      prototype = new ShootPrototype(prototype);
+      prototype = new ShootPrototype(prototype, i);
+        // TODO complete provenance would be word + " (" + i + ")");
       this.prototypes.push(prototype);
     }
+
   }
   this.quiet = function(list = null) {
     if (list == null) {
@@ -48,17 +52,24 @@ function ShootFactory() {
     }
     if (match != null)
       this.prototypes.splice(match, 1);
-  }
-  this.gen = function(origin_vertex){
+  };
+
+  this.genShoot = function(origin_vertex){
     if (this.prototypes.length == 0){
-      return [];
+      return null;
     }
-    return this.prototypes[Math.floor(Math.random() * this.prototypes.length)].gen(origin_vertex);
-  }
+    i = Math.floor(Math.random() * this.prototypes.length);
+    return new Shoot(origin_vertex[0], origin_vertex[1], 
+      this.prototypes[i].gen(origin_vertex),
+      this.prototypes[i].name);
+  };
 }
 
-function ShootPrototype(permitted_angles){
+function ShootPrototype(permitted_angles, name){
+  
   this.permitted_angles = permitted_angles;
+  this.name = name;
+
   this.gen = function(origin_vertex){
     if (origin_vertex.length == 0){
       console.log("????");
@@ -81,6 +92,7 @@ function ShootPrototype(permitted_angles){
     }
     return output;
   };
+
 }
 
 function jitter(angle){
@@ -88,11 +100,12 @@ function jitter(angle){
 }
 
 var vertices, segments, angles;
+var stats = {};
 var clX = -1, clY = -1;
-animating = true;
+var animating = true;
 
 function quiet(){
-  shoot.quiet()
+  shoot.quiet();
   segments = [];
   vertices = [];
 }
@@ -108,11 +121,8 @@ function setup() {
 
     textSize(15);
 
-    // list of all vertices
     vertices = new Array([width/2, height/2]);
-    // list of all segments
     segments = new Array();
-    // TODO use objects!!
 
     shoot = new ShootFactory();
 
@@ -194,16 +204,15 @@ function draw() {
      v_in = Math.floor(Math.random() * vertices.length);
      start_vertex = vertices[v_in];
     }
-    let angles = shoot.gen(start_vertex);
-    let s = new Shoot(start_vertex[0], start_vertex[1], angles);
-    if (s.gen(10) && v_in != null) {
+    let s = shoot.genShoot(start_vertex);
+
+    if (s != null && s.gen() && v_in != null) {
       vertices.splice(v_in, 1);
     }
   }
 
  for (i in segments) {
       s = segments[i];
-
       line(s[0], s[1], s[2], s[3]);
     }
 
@@ -224,11 +233,12 @@ function draw() {
 
 }
 
-function Shoot(origin_x, origin_y, angles) {
+function Shoot(origin_x, origin_y, angles, name) {
 
     this.origin_y = origin_y;
     this.origin_x = origin_x;
     this.angles = angles;
+    this.name = name;
 
     this.gen = function() {
 
@@ -276,8 +286,11 @@ function Shoot(origin_x, origin_y, angles) {
           y = provisional_vertices[i][1];
           vertices.push([x,y])
           segments.push([this.origin_x, this.origin_y, x, y])
-          // TODO remove the implicated vertex
-
+          if (this.name in stats) {
+            stats[this.name] += 1;
+          } else {
+            stats[this.name] = 0;
+          }
 
           // TODO decide how to maintain this kind of behaviour
           //if (Math.random()<0.9) {
@@ -288,7 +301,7 @@ function Shoot(origin_x, origin_y, angles) {
       }
 
       return false;
-    }
+    };
 }
 
 // via https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line

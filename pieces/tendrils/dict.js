@@ -226,11 +226,11 @@ donkey
 }
 
 function dict(word){
-	let output = [];
+	let output = {};
 	if (word in _DICT){
 		// first, check if there are angles.
 		if ("angles" in _DICT[word]){
-			output.push(_DICT[word].angles);
+			output[word] = _DICT[word].angles;
 		}
 		// second, add anything in the composites.
 		if ("composite" in _DICT[word]){
@@ -240,7 +240,7 @@ function dict(word){
 				add_list = dict(_DICT[word].composite[i]);
 				console.log(add_list)
 				for (var j in add_list){
-					output.push(add_list[j]);
+					output[j] = add_list[j];
 				}
 				
 			}
