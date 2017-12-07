@@ -23,13 +23,41 @@ var _DICT = {
 		"meta": "lexember day 1"
 	},
 	"change": {
-		"angles": [0, Math.PI/2] //TODO
+		"angles": [0, 1.1780972450961724, 2.356194490192345]
 	},
 	"i": {
 		"angles": [Math.PI/8, 7*Math.PI/8] //TODO
 	},
 	"we": {
 		"angles": [0, Math.PI, Math.PI/8, 7*Math.PI/8] //TODO
+	},
+	"movement": {
+		"composite": ["change", "time"]
+	},
+	"moving-one": {
+		"composite": ["i", "negation", "movement"]
+	},
+	"still-one": {
+		"composite": ["i", "negation"]
+	},
+	"time": {
+		"angles": [0, 3.9269908169872414, 4.71238898038469, 5.105088062083414]
+	},
+	"now": {
+		"angles": [Math.PI/2, 3*Math.PI/2]
+	},
+	"here": {
+		"angles": [0, 7*Math.PI/8]
+	},
+	"before": {
+		"angles": [0, 1.9634954084936207, 2.356194490192345, 3.141592653589793, 4.319689898685965]
+	},
+	"after": {
+		"composite": ["before", "negation"]
+	},
+	"being-time": {
+		"composite": ["we", "time"],
+		"related": ["timescale", "time"]
 	},
 	"division": {
 		"composite": ["change", "manyness", "negation", "measurement"],
@@ -222,6 +250,28 @@ herd
 shepherd
 donkey
 
+Day 7
+
+School
+
+textbook
+desk
+teacher
+student
+Jobs
+
+lawyer
+doctor
+farmer
+driver
+Government & Laws
+
+amendment
+article
+constitution
+monarchy
+democracy
+
 */
 }
 
@@ -303,8 +353,6 @@ function test_dict() {
 				if ( !(comp in _DICT) ){
 					console.log("Composite " + comp + " for word " +
 						word + " is missing definition.");
-					// TODO this test should be recursive, to test that no circular
-					// definitions or definitions without angles exist.
 					passed = false;
 				}
 			}
@@ -321,7 +369,7 @@ function test_dict() {
 	let dupdict = {};
 	for (var word in _DICT) {
 		if ("angles" in _DICT[word]) {
-			// TODO this normalization ought to happen as a pre-processing step?
+			
 			let normalized = [];
 		
 			for (var i in _DICT[word].angles) {
@@ -365,4 +413,31 @@ function test_dict() {
 		console.log("Passed orthographic uniqueness test with " +
 			Object.keys(dupdict).length + " composite expressions.");
 	}
+
+	return dupdict;
 }
+
+
+function make_new_angle(sensitivity = 1/8, trials = 100) {
+	dupdict = test_dict();
+
+	sensitivity = Math.PI * sensitivity;
+	let goodangle = false;
+	while (!goodangle && trials > 0) {
+		trials --;
+		let newangle = [0];
+		for(var i = sensitivity; i < Math.PI*2; i += sensitivity) {
+			if (Math.random() < 0.4) {
+				newangle.push(i);
+			}
+		}
+		if (newangle.join() in dupdict) {
+			console.log("Ruling out " + newangle);
+		} else {
+			goodangle = true;
+			console.log("Try out: " + newangle);
+			return newangle;
+		}
+	}
+}
+

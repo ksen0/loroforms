@@ -15,8 +15,6 @@ var CLEARANCE = 5;
 
 function ShootFactory() {
   this.prototypes = [];
-  // TODO enable non-uniform probability distribution, both for growth and inhibition
-  // TODO also connect it to current distribution?
   this.grow = function(word) {
 
     prototype_list = dict(word);
@@ -29,12 +27,14 @@ function ShootFactory() {
     }
 
   }
-  this.quiet = function(list = null) {
-    if (list == null) {
+  this.quiet = function(word = null) {
+    if (word == null) {
       console.log("Extinguished " + this.prototypes.length + " proto-forms.");
       this.prototypes = [];
       return;
     }
+    // TODO his does not work.
+    list = dict(word);
     list.sort();
     let match = null;
     for (var i in this.prototypes) {
