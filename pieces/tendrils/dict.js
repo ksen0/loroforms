@@ -103,6 +103,54 @@ var _DICT = {
 		"synonyms": ["son", "daughter", "child"],
 		"meta": "lexember day 1"
 	},
+	"friend": {
+		"composite": ["negation", "i", "loving"],
+		"synonyms": ["loved one(s)"]
+	},
+	"square root": {
+		"composite": ["power (math)", "half"]
+	},
+	"power (math)": {
+		"composite": ["multiplication", "recursion"]
+	},
+	"recursion": {
+		"angles": [0, 0.39269908169872414, 4.319689898685965, 5.497787143782139, 5.890486225480863]
+	},
+	"gathering": {
+		"composite": ["vegetable", "accumulation"],
+		"synonyms": ["to gather", "to pick (fruit)", "picking (fruit)"]
+	},
+	"hunting": {
+		"composite": ["meat", "accumulation"],
+		"synonyms": ["to hunt"]
+	},
+	"accumulation": {
+		"composite": ["add"]
+	},
+	"preparation (food)": {
+		"composite": ["meat", "change", "manyness"],
+		"synonyms": ["to filet", "to chop", "to break down (nutrients)"]
+	},
+	"lover": {
+		"composite": ["friend", "reproduction"],
+		"synonyms": ["partner"]
+	},
+	"reproduction": {
+		"composite": ["we", "manyness"]
+	},
+	"river": {
+		"composite": ["liquid", "here"]
+	},
+	"liquid": {
+		"composite": ["state (chem.)", "medium"]
+	},
+	"state (chem.)":{
+		"angles": [0, 0.7853981633974483, 1.5707963267948966, 3.5342917352885173, 4.319689898685965]
+	},
+	"half": {
+		"angles": [0, 0.7853981633974483, 1.1780972450961724, 1.5707963267948966, 2.356194490192345, 3.5342917352885173, 3.9269908169872414, 4.319689898685965, 5.890486225480863],
+		"synonyms": ["medium"]
+	}
 	/*
 	"joy/bliss/transcendence": { // these should be many composites, their emotional vocabulary should be vast
 		"composite": ["we", "after", "being-time"],
@@ -118,33 +166,13 @@ var _DICT = {
 	}*/
 
 /*
-	DAY 2
-square root
-fraction
-power
-measurement
-Food and cooking
-
-to gather
-to pick (berries)
-to hunt
-to filet
-to chop
-Family and relationships
-
-loved one(s)
-partner
-lover
-friend
-friendship
-Emotions
 
 Terror
 Nervousness
 Worry
 Confidence
 Hope
-Day 5
+
 
 Nature & outdoors
 
@@ -271,6 +299,53 @@ article
 constitution
 monarchy
 democracy
+
+Day 8
+
+School
+
+homework
+schoolbus
+substitute teacher
+diploma
+exam
+class
+pupil
+Jobs
+
+babysitter
+nurse
+engineer
+scribe
+Government & Laws
+
+decree
+republic
+dictatorship
+coup
+citizen
+sovereign
+president
+king
+
+Days 9 and 10
+
+Apologies for the no-show on day 9 and the late delivery today. I'll make the reason for my absence the topic of that one, it should provide more than enough diversity. Have fun!
+beer
+rum
+whisky
+wine
+water
+raclette
+potato
+cheese
+roquefort
+goat cheese
+bacon
+ham
+cured meat
+friend
+birthday
 
 */
 }
@@ -431,13 +506,19 @@ function make_new_angle(sensitivity = 1/8, trials = 100) {
 				newangle.push(i);
 			}
 		}
-		if (newangle.join() in dupdict) {
-			console.log("Ruling out " + newangle);
-		} else {
-			goodangle = true;
-			console.log("Try out: " + newangle);
-			return newangle;
+		for (var i in newangle) {
+			let newangle_shift = [];
+			for (var j in newangle) {
+				newangle_shift[j] = ((newangle[j] - newangle[i]) + Math.PI * 2) % (Math.PI*2);
+			}
+			if (newangle_shift.join() in dupdict) {
+				console.log("Ruling out " + newangle);
+				return null;
+			}			
 		}
+		goodangle = true;
+		console.log("Try out: " + newangle);
+		return newangle;
 	}
 }
 
