@@ -10,8 +10,8 @@
 // TODO add fading over time, with smaller "clusters" fading faster than big ones
 // bc of the symbiosis
 
-var JITTER = Math.PI/16;
-var CLEARANCE = 5;
+var JITTER = Math.PI/32;
+var CLEARANCE = 2;
 
 function ShootFactory() {
   this.prototypes = [];
@@ -208,6 +208,9 @@ function draw() {
     let s = shoot.genShoot(start_vertex);
 
     if (s != null && s.gen() && v_in != null) {
+      if (Math.random() < 0.5) {
+        segments.splice(0, 1);
+      }
       vertices.splice(v_in, 1);
     }
   }
@@ -251,9 +254,7 @@ function Shoot(origin_x, origin_y, angles, name) {
 
       for (var a in this.angles) {
         let angle = this.angles[a];
-        // TODO add sensible parameterization to distance
-        let dist = Math.pow(Math.pow(Math.random() * 3, 2), 2) + 10;
-        //let dist = Math.pow(Math.pow(Math.random() * 4, 2), 2) + 10;
+        let dist = 10;
         let x = Math.floor(this.origin_x + dist * Math.cos(angle));
         let y = Math.floor(this.origin_y + dist * Math.sin(angle));
         ok = true;
