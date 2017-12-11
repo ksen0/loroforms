@@ -8,10 +8,11 @@
     <script type="text/javascript">
 
 // TODO add fading over time, with smaller "clusters" fading faster than big ones
-// bc of the symbiosis
+// bc of the symbiosis?
 
 var JITTER = Math.PI/32;
 var CLEARANCE = 2;
+var DEATH_RATE = 0.3;
 
 function ShootFactory() {
   this.prototypes = [];
@@ -72,7 +73,6 @@ function ShootPrototype(permitted_angles, name){
 
   this.gen = function(origin_vertex){
     if (origin_vertex.length == 0){
-      console.log("????");
     }
     let offset = 0;
     let which = Math.floor(Math.random() * this.permitted_angles.length);
@@ -208,7 +208,7 @@ function draw() {
     let s = shoot.genShoot(start_vertex);
 
     if (s != null && s.gen() && v_in != null) {
-      if (Math.random() < 0.5) {
+      if (Math.random() < DEATH_RATE) {
         segments.splice(0, 1);
       }
       vertices.splice(v_in, 1);
@@ -254,7 +254,7 @@ function Shoot(origin_x, origin_y, angles, name) {
 
       for (var a in this.angles) {
         let angle = this.angles[a];
-        let dist = 10;
+        let dist = 10 + Math.random()*6;
         let x = Math.floor(this.origin_x + dist * Math.cos(angle));
         let y = Math.floor(this.origin_y + dist * Math.sin(angle));
         ok = true;
