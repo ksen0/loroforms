@@ -1,4 +1,7 @@
 var _DICT = {
+	"NIL": {
+		"angles": [0, Math.PI]
+	},
 	"lack": {
 		"angles": [0, Math.PI/2]
 	},
@@ -26,7 +29,11 @@ var _DICT = {
 		"angles": [0, 1.1780972450961724, 2.356194490192345]
 	},
 	"i": {
-		"angles": [Math.PI/8, 7*Math.PI/8] //TODO
+		"angles": [Math.PI/8, 7*Math.PI/8],
+		"synonyms": ["self"],
+		"modifiers": {
+			"loro-inhibition": "other being"
+		}
 	},
 	"we": {
 		"angles": [0, Math.PI, Math.PI/8, 7*Math.PI/8] //TODO
@@ -35,7 +42,8 @@ var _DICT = {
 		"composite": ["change", "time"]
 	},
 	"moving-one": {
-		"composite": ["i", "negation", "movement"]
+		"composite": ["i", "negation", "movement"],
+		"synonyms": ["animals"]
 	},
 	"still-one": {
 		"composite": ["i", "negation"]
@@ -47,7 +55,10 @@ var _DICT = {
 		"angles": [Math.PI/2, 3*Math.PI/2]
 	},
 	"here": {
-		"angles": [0, 7*Math.PI/8]
+		"angles": [0, 7*Math.PI/8],
+		"modifiers": {
+			"stonerose": "there"
+		}
 	},
 	"before": {
 		"angles": [0, 1.9634954084936207, 2.356194490192345, 3.141592653589793, 4.319689898685965]
@@ -104,7 +115,7 @@ var _DICT = {
 		"meta": "lexember day 1"
 	},
 	"friend": {
-		"composite": ["negation", "i", "loving"],
+		"composite": ["negation", "i", "joy"],
 		"synonyms": ["loved one(s)"]
 	},
 	"square root": {
@@ -139,7 +150,8 @@ var _DICT = {
 		"composite": ["we", "manyness"]
 	},
 	"river": {
-		"composite": ["liquid", "here"]
+		"composite": ["liquid", "here"],
+		"synonyms": ["stream"]
 	},
 	"liquid": {
 		"composite": ["state (chem.)", "medium"]
@@ -150,44 +162,84 @@ var _DICT = {
 	"half": {
 		"angles": [0, 0.7853981633974483, 1.1780972450961724, 1.5707963267948966, 2.356194490192345, 3.5342917352885173, 3.9269908169872414, 4.319689898685965, 5.890486225480863],
 		"synonyms": ["medium"]
-	}
-	/*
-	"joy/bliss/transcendence": { // these should be many composites, their emotional vocabulary should be vast
-		"composite": ["we", "after", "being-time"],
-		"synonyms": ["son", "daughter", "child"],
-		"loro": true,//TODO maybe synonyms could be more general "relationships" and be dicts w additional metadata
-		"meta": "lexember day 1"
 	},
-	"despair/sorrow/anger": {
-		"composite": ["we", "after", "being-time"],
-		"synonyms": ["son", "daughter", "child"],
-		"loro": true,//TODO
-		"meta": "lexember day 1"
-	}*/
+	"joy": {
+		"composite": ["state (chem.)", "i"],
+		"modifiers": {
+			"loro-inhibition": "transcendence",
+			"stonerose": "masochism"
+		},
+		"angles": [0, 1.1780972450961724, 1.5707963267948966, 1.9634954084936207, 3.141592653589793, 3.5342917352885173, 4.319689898685965, 4.71238898038469]
+	},
+	"bliss": {
+		"composite": ["joy", "unawareness"],
+		"synonyms": ["ecstasy"],
+		"explanation": "happiness that precludes awareness"
+	},
+	"unawareness": {
+		"composite": ["negation", "perceiving"]
+	},
+	"perceiving": {
+		"synonyms": ["seeing", "awareness", "to be aware"]
+	},
+	"despair": {
+		"composite": ["lack", "bliss"]
+	},
+	"sorrow": {
+		"composite": ["lack", "joy"]
+	},
+	"anger": {
+		"composite": ["change", "wanting"],
+		"modifiers": {
+			"loro-inhibition": "hope",
+			"stonerose": "productivity"
+		}
+	},
+	"terror": {
+		"composite": ["unawareness"],
+		"angles": [0, 1.1780972450961724, 2.356194490192345, 3.5342917352885173, 5.890486225480863]
+	},
+	"worry": {
+		"composite": ["perceiving", "danger"],
+		"synonyms": ["nervousness"]
+	},
+	"danger": {
+		"angles": [0, Math.PI, Math.PI/8, 7*Math.PI/8, Math.PI + Math.PI/8, Math.PI + 7*Math.PI/8]
+	},
+	"confidence": {
+		"composite": ["negation", "worry"]
+	},
+	"bank (nature)": {
+		"composite": ["river", "edge"]
+	},
+	"edge": {
+		"angles": [0, 1.5707963267948966, 2.356194490192345, 3.5342917352885173, 5.105088062083414]
+	},
+	"wanting": {
+		"synonyms": ["desire", "to want", "need", "want"]
+	},
+	"lake": {
+		"composite": ["liquid", "manyness"],
+		"synonyms": ["sea", "ocean"]
+	},
+	"astronomy": {
+		"composite": ["discovery", "space"]
+	},
+	"space": {
+		"composite": ["before","i", "manyness"]
+	},
+	"black hole": {
+		"composite": ["hunger", "space"]
+	},
+	"satellite": {
+		"composite": ["moving-one", "space"],
+		"synonyms": ["asteroid", "comet"]
+	},
+
 
 /*
 
-Terror
-Nervousness
-Worry
-Confidence
-Hope
 
-
-Nature & outdoors
-
-river
-bank
-stream
-lake
-sea/ocean
-Astronomy
-
-black hole
-satellite
-asteroid
-comet
-Animals
 
 horn
 hoof
@@ -450,7 +502,7 @@ function test_dict() {
 			for (var i in _DICT[word].angles) {
 				let a = _DICT[word].angles[i];
 				if (a < 0){ // add 2*Math.PI to every negative angle
-					normalized.push(a + Math.PI * 2); 
+					normalized.push(a + (Math.PI * 2)); 
 				} else if (a >= Math.PI * 2) { // remainder with 2*Math.PI
 					normalized.push(a % (Math.PI * 2) );
 				} else {
@@ -465,8 +517,13 @@ function test_dict() {
 				continue;
 			}
 			for (var i in normalized) { // start angle list at 0
-				normalized[i] = normalized[i] - normalized[0];
+				if (i != 0)
+					normalized[i] = normalized[i] - normalized[0];
 			}
+			normalized[0] = 0;
+			//console.log(word);
+			//console.log(_DICT[word].angles);
+			//console.log(normalized);
 			for (var i in normalized) { // check for internal duplicates
 				if (normalized.indexOf(normalized[i]) != i) {
 					console.log("Angle precets for " + word + " contain a duplicate: " + normalized[i]);
