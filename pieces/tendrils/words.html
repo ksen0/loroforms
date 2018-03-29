@@ -12,7 +12,7 @@
 
 var JITTER = Math.PI/32;
 var CLEARANCE = 2;
-var DEATH_RATE = 0.1;
+var DEATH_RATE = 0.075;
 
 function ShootFactory() {
   this.prototypes = [];
@@ -116,9 +116,10 @@ function setup() {
 
     width = window.innerWidth-10
     height = window.innerHeight-10
+    background("white")
 
     createCanvas(width, height);
-    frameRate(50);
+    frameRate(60);
     stroke("green")
 
     textSize(15);
@@ -194,8 +195,8 @@ function containsSegment(x1, y1, x2, y2, sx, sy) {
 }
 
 function draw() {
-  background(0);
-  stroke("gray")
+  background("white");
+  stroke("black")
   strokeWeight(1);
 
   if (animating) {
@@ -203,22 +204,33 @@ function draw() {
     let v_in = null;
     let start_vertex = [Math.floor(Math.random() * window.innerWidth),
                           Math.floor(Math.random() * window.innerHeight)]
-    if (vertices.length > 0 && Math.random() < 0.9){
+    if (vertices.length > 0 && Math.random() < 0.95){
      v_in = Math.floor(Math.random() * vertices.length);
      start_vertex = vertices[v_in];
     }
     let s = shoot.genShoot(start_vertex);
 
     if (s != null && s.gen() && v_in != null) {
-      if (Math.random() < DEATH_RATE) {
-        segments.splice(0, 1);
-      }
       vertices.splice(v_in, 1);
     }
+    if (Math.random() < DEATH_RATE) {
+      // Problem: have to destroy whole nodes, and wither all implicated segments off a little?
+      // "shorten" them??
+      // and also need a hash map of notes to what they express, so that "stats" is updated
+      // death-rate regulation helps to manage expression using deltas:
+      // if the change is acceptable,d eath rate decreased, if not, increases. can it be 1? yes!
+      // generally : higher death rate means fasted communication.
+      // death rate above .1 also inhibits growth of the sedentary lichen
+      segments.splice(0, 1);
+    }
+
   }
 
  for (i in segments) {
       s = segments[i];
+      stroke("gray");
+      ellipse(s[0],s[1],5,5);
+      stroke("black");
       line(s[0], s[1], s[2], s[3]);
     }
 /*
@@ -274,10 +286,10 @@ function Shoot(origin_x, origin_y, angles, name) {
             this.origin_x, this.origin_y, x, y)){
               ok = false;
           }
-
+/*
           if (distance_bw(x,y,s[0],s[1],s[2],s[3]) < CLEARANCE || distance_bw(s[2],s[3],x,y) < CLEARANCE) {
             ok = false;
-          }
+          }*/
         }
         if (ok) {
           provisional_vertices.push([x,y]);
@@ -335,6 +347,6 @@ function mouseMoved() {
 
       </script>
    </head>
-   <body style="padding:0px;margin:auto;background-color:#000">
+   <body style="padding:0px;margin:auto;background-color:#fff">
    </body>
 </html>
