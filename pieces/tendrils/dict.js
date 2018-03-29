@@ -14,6 +14,9 @@ var _DICT = {
 	"negation": {
 		"angles": [0, Math.PI, 3*Math.PI/2]
 	},
+	"<emphasis>": {
+		"angles": [0, 0.39269908169872414, 0.7853981633974483, 1.1780972450961724, 1.5707963267948966, 1.9634954084936207, 2.748893571891069, 3.141592653589793, 5.890486225480863]
+	},
 	"manyness": {
 		"angles": [0, 2*Math.PI/3, 4*Math.PI/3, Math.PI/8, 2*Math.PI/3 + Math.PI/8, 4*Math.PI/3 + Math.PI/8]
 	},
@@ -235,7 +238,42 @@ var _DICT = {
 		"composite": ["moving-one", "space"],
 		"synonyms": ["asteroid", "comet"]
 	},
+	"travel": {
+		"composite": ["space", "movement"]
+	}
 
+
+/*
+
+shoot.grow("travel")
+
+shoot.grow("negation")
+shoot.grow("movement")
+
+shoot.grow("<emphasis>")
+shoot.grow("i", mod="loro-inhibition")
+
+
+"i": {
+		"angles": [Math.PI/8, 7*Math.PI/8],
+		"synonyms": ["self"],
+		"modifiers": {
+			"loro-inhibition": "other being"
+		}
+
+For the Lsot Mail Mural
+
+travel not in space but through the eyes of another
+
+Travel
+	negation space-movement
+	like
+		inner-being
+		inner-becoming
+		other-being
+		other-becoming
+
+*/
 
 /*
 
